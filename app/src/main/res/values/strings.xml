@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">CallerInsightDemo</string>
+    <string name="caller_info">📞 %1$s\nLikely spam (demo)</string>
 </resources>

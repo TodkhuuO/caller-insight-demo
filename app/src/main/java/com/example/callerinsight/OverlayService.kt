@@ -7,6 +7,7 @@ import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
+import android.widget.FrameLayout
 import android.widget.TextView
 
 class OverlayService : Service() {
@@ -18,11 +19,15 @@ class OverlayService : Service() {
         val phone = intent?.getStringExtra("PHONE_NUMBER") ?: "Unknown"
 
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
+
+        // Fix: Use a simple FrameLayout as parent container
+        val container = FrameLayout(this)
         overlayView = LayoutInflater.from(this)
-            .inflate(R.layout.over_view, null)
+            .inflate(R.layout.over_view, container, false)
 
         val text = overlayView.findViewById<TextView>(R.id.textResult)
-        text.text = "📞 $phone\nLikely spam (demo)"
+        // Use string resource with placeholder
+        text.text = getString(R.string.caller_info, phone)
 
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT,
@@ -38,7 +43,9 @@ class OverlayService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        windowManager.removeView(overlayView)
+        if (::overlayView.isInitialized) {
+            windowManager.removeView(overlayView)
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
